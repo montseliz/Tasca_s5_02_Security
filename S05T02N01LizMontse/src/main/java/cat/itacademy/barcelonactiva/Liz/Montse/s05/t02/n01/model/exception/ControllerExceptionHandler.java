@@ -14,13 +14,6 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
-    @ExceptionHandler(EmailDuplicatedException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Message> emailDuplicatedExceptionHandler (EmailDuplicatedException exception, WebRequest request) {
-
-        return new ResponseEntity<>(new Message(HttpStatus.BAD_REQUEST.value(), LocalDateTime.now(), exception.getMessage(), request.getDescription(false)), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(PasswordIncorrectException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public ResponseEntity<Message> passwordIncorrectExceptionHandler (PasswordIncorrectException exception, WebRequest request) {
@@ -50,10 +43,17 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(PlayerDuplicatedException.class)
-    @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
     public ResponseEntity<Message> playerDuplicatedExceptionHandler(PlayerDuplicatedException exception, WebRequest request) {
 
-        return new ResponseEntity<>(new Message(HttpStatus.NOT_ACCEPTABLE.value(), LocalDateTime.now(), exception.getMessage(), request.getDescription(false)), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(new Message(HttpStatus.CONFLICT.value(), LocalDateTime.now(), exception.getMessage(), request.getDescription(false)), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(EmailDuplicatedException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ResponseEntity<Message> emailDuplicatedExceptionHandler (EmailDuplicatedException exception, WebRequest request) {
+
+        return new ResponseEntity<>(new Message(HttpStatus.CONFLICT.value(), LocalDateTime.now(), exception.getMessage(), request.getDescription(false)), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)

@@ -16,4 +16,5 @@ public interface IPlayerRepository extends JpaRepository<Player, Long> {
     Optional<Player> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
 }

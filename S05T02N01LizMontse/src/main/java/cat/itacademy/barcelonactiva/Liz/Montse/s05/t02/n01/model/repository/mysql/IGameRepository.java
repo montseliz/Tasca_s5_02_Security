@@ -10,5 +10,6 @@ public interface IGameRepository extends JpaRepository<Game, Long> {
     default boolean isEmpty() {
         return count() == 0;
     }
+
 }
 

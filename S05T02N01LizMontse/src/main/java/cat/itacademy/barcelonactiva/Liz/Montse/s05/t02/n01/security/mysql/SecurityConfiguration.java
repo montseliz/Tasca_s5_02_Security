@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.configuration.OpenApiConfiguration.PUBLIC_PATHS;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -38,7 +40,7 @@ public class SecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(PUBLIC_PATHS).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

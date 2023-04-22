@@ -59,6 +59,8 @@ Has de tindre en compte els  següents detalls de  construcció:
 - https://www.youtube.com/playlist?list=PL82C6-O4XrHe3sDCodw31GjXbwRdCyyuY 
 - https://bootify.io/spring-rest/rest-api-spring-security-with-jwt.html 
 - https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx 
+- https://www.baeldung.com/openapi-jwt-authentication 
+- https://www.javachinna.com/configure-openapi-spec-basic-jwt-authentication/
 
 
 ## Nivell 2

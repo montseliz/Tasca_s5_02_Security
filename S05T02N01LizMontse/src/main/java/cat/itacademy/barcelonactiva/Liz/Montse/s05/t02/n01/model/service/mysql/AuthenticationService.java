@@ -132,7 +132,6 @@ public class AuthenticationService {
         return new AuthenticationResponseDTO(loginDTOValidated.getEmail(), passwordEncoder.encode(loginDTOValidated.getPassword()), token);
     }
 
-
     /**
      * Mètode per validar l'email i el password a la base de dades. S`utilitza en el mètode authenticateRegister().
      */

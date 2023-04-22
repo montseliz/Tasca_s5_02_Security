@@ -56,14 +56,17 @@ public class Player {
      */
     @Column(name = "email", nullable = false, unique = true)
     @Email
+    @Schema(description = "Email of the player", example = "montse@gmail.com")
     private String email;
 
     @Column(name = "password", nullable = false)
     @NotBlank
+    @Schema(description = "Password of the player", example = "password123")
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
+    @Schema(description = "Role of the player", example = "USER")
     private Role role;
 
     public Player(String name, String email, String password) {
