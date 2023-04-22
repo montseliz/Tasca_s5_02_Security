@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.mysql;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -13,8 +13,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Date;
 
-import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.mysql.SecurityConstants.JWT_EXPIRATION;
-import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.mysql.SecurityConstants.JWT_SECRET;
+import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.SecurityConstants.JWT_EXPIRATION;
+import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.SecurityConstants.JWT_SECRET;
 
 @Component
 public class JwtGenerator {
@@ -50,7 +50,7 @@ public class JwtGenerator {
                 throw new AuthenticationCredentialsNotFoundException("Your token has expired");
             }
             return true;
-        } catch (Exception e) {
+        } catch (AuthenticationCredentialsNotFoundException e) {
             throw new AuthenticationCredentialsNotFoundException("Your token is incorrect", e.getCause());
         }
     }

@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.mysql;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security;
 
 public class SecurityConstants {
 

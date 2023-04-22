@@ -1,6 +1,5 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.mysql;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security;
 
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +19,10 @@ import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.configuration.
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
-    public SecurityConfiguration(CustomUserDetailsService userDetailsService, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
-        this.userDetailsService = userDetailsService;
+    public SecurityConfiguration(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 

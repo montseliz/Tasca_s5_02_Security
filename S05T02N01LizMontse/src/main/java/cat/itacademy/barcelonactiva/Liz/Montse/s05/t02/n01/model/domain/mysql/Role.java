@@ -28,10 +28,10 @@ public class Role {
 
     @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = Player.class, cascade = CascadeType.ALL)
     @JsonIgnore
-    @Schema(description = "List of players having a same role")
+    @Schema(description = "List of players having the same role")
     private List<Player> players = new ArrayList<>();
 
-    public Role (String name) {
+    public Role(String name) {
         this.name = name;
     }
 

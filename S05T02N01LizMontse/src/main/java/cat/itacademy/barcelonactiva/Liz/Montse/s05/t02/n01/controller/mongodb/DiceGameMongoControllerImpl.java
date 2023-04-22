@@ -3,6 +3,7 @@ package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.controller.mongodb;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.Message;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.GameMongoDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.PlayerMongoDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.RegisterMongoDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.GamesNotFoundException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerDuplicatedException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerNotFoundException;
@@ -42,28 +43,6 @@ public class DiceGameMongoControllerImpl implements IDiceGameMongoController{
     }
 
     @Override
-    @PostMapping(value = "/add", produces = "application/json", consumes = "application/json")
-    @Operation(summary = "Create a new player", description = "Adds a new player into the database")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Player created correctly", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PlayerMongoDTO.class))}),
-            @ApiResponse(responseCode = "406", description = "Player's name not valid", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Message.class))}),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error while creating the player", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Message.class))})})
-
-    public ResponseEntity<PlayerMongoDTO> addPlayer(@RequestBody PlayerMongoDTO playerDTO) throws Exception {
-
-        try {
-            return new ResponseEntity<>(playerService.createPlayer(playerDTO), HttpStatus.CREATED);
-        } catch (PlayerDuplicatedException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new Exception("Internal Server Error while creating the player", e.getCause());
-        }
-    }
-
-    @Override
     @PutMapping(value = "/update/{id}", produces = "application/json", consumes = "application/json")
     @Operation(summary = "Update player's name", description = "Updates an existing player in the database")
     @ApiResponses(value = {
@@ -76,10 +55,10 @@ public class DiceGameMongoControllerImpl implements IDiceGameMongoController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while updating the player", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<PlayerMongoDTO> updatePlayer(@Parameter(description = "The id of the player to be updated") @PathVariable ObjectId id, @RequestBody PlayerMongoDTO playerDTO) throws Exception {
+    public ResponseEntity<PlayerMongoDTO> updatePlayer(@Parameter(description = "The id of the player to be updated") @PathVariable ObjectId id, @RequestBody RegisterMongoDTO registerMongoDTO) throws Exception {
 
         try {
-            return new ResponseEntity<>(playerService.editPlayer(id, playerDTO), HttpStatus.OK);
+            return new ResponseEntity<>(playerService.editPlayer(id, registerMongoDTO), HttpStatus.OK);
         } catch (PlayerNotFoundException | PlayerDuplicatedException e) {
             throw e;
         } catch (Exception e) {

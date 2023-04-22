@@ -4,8 +4,8 @@ import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mongodb.
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mongodb.PlayerMongo;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.GameMongoDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.PlayerMongoDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.RegisterMongoDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.GamesNotFoundException;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerDuplicatedException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.repository.mongodb.IPlayerMongoRepository;
 import jakarta.transaction.Transactional;
@@ -27,11 +27,13 @@ public class DiceGameMongoServiceImpl implements IPlayerMongoService, IGameMongo
     private ModelMapper modelMapper;
 
     private final IPlayerMongoRepository playerRepository;
+    private final AuthenticationServiceMongo authenticationServiceMongo;
 
     @Autowired
-    public DiceGameMongoServiceImpl(IPlayerMongoRepository playerRepository) {
+    public DiceGameMongoServiceImpl(IPlayerMongoRepository playerRepository, AuthenticationServiceMongo authenticationServiceMongo) {
         super();
         this.playerRepository = playerRepository;
+        this.authenticationServiceMongo = authenticationServiceMongo;
     }
 
     //region CONVERTERS
@@ -68,22 +70,11 @@ public class DiceGameMongoServiceImpl implements IPlayerMongoService, IGameMongo
     }
 
     @Override
-    public PlayerMongoDTO createPlayer(PlayerMongoDTO playerDTO) {
-        PlayerMongoDTO playerValidated = validatePlayerName(playerDTO);
-        PlayerMongo newPlayer = new PlayerMongo(playerValidated.getName());
-        PlayerMongo playerSaved = playerRepository.save(newPlayer);
-        PlayerMongoDTO playerDTOToReturn = convertPlayerToDTO(playerSaved);
-        playerDTOToReturn.setWinPercentage("No games played yet");
-
-        return playerDTOToReturn;
-    }
-
-    @Override
-    public PlayerMongoDTO editPlayer(ObjectId id, PlayerMongoDTO playerDTO) {
+    public PlayerMongoDTO editPlayer(ObjectId id, RegisterMongoDTO registerMongoDTO) {
         PlayerMongo playerToUpdate = getPlayerById(id);
 
-        PlayerMongoDTO playerValidated = validatePlayerName(playerDTO);
-        playerToUpdate.setName(playerValidated.getName());
+        RegisterMongoDTO registerNameValidated = authenticationServiceMongo.validateRegisterName(registerMongoDTO);
+        playerToUpdate.setName(registerNameValidated.getName());
 
         PlayerMongo playerUpdated = playerRepository.save(playerToUpdate);
 
@@ -160,30 +151,6 @@ public class DiceGameMongoServiceImpl implements IPlayerMongoService, IGameMongo
     }
 
     /**
-     * Mètode per comprovar si el nom del Player és únic perquè no es repeteixi a la base de dades i mentre no sigui "unknown".
-     * S'utilitza en els mètodes createPlayer() i editPlayer().
-     */
-    public PlayerMongoDTO validatePlayerName(PlayerMongoDTO playerDTO) {
-        PlayerMongoDTO playerUnknown = createUnknownPlayer(playerDTO);
-        if ((playerRepository.existsByName(playerUnknown.getName())) && (!playerDTO.getName().equalsIgnoreCase("unknown"))) {
-            throw new PlayerDuplicatedException("Player's name must be unique");
-        } else {
-            return playerDTO;
-        }
-    }
-
-    /**
-     * Mètode per generar el nom del Player a "unknown" en cas que sigui null, buit o en blanc.
-     * S'utilitza en el mètode validatePlayerName().
-     */
-    public PlayerMongoDTO createUnknownPlayer (PlayerMongoDTO playerDTO) {
-        if ((playerDTO.getName() == null) || (playerDTO.getName().isEmpty()) || (playerDTO.getName().isBlank())) {
-            playerDTO.setName("unknown");
-        }
-        return playerDTO;
-    }
-
-    /**
      * Mètode encarregat de calcular el percentatge de victòries del Player.
      * S'utilitza en el mètode editPlayer(), getPlayersWithWinPercentage() i playersWhoPlayed().
      */
@@ -242,8 +209,7 @@ public class DiceGameMongoServiceImpl implements IPlayerMongoService, IGameMongo
             throw new GamesNotFoundException("There are no games stored in the database");
         } else {
             allPlayers.forEach(p -> allPlayersDTO.add(obtainWinPercentage(p)));
-            return allPlayersDTO.stream().filter(p -> !p.getWinPercentage().equals("No games played yet")
-                    && !p.getWinPercentage().equals("Cannot calculate a player's winning percentage with no games played")).collect(Collectors.toList());
+            return allPlayersDTO.stream().filter(p -> !p.getWinPercentage().equals("Cannot calculate a player's winning percentage with no games played")).collect(Collectors.toList());
         }
     }
 

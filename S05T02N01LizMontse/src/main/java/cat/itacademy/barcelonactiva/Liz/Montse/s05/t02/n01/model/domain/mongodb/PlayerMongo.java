@@ -2,6 +2,8 @@ package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mongodb
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,8 +39,25 @@ public class PlayerMongo {
     @Schema(description = "Player's games history")
     private List<GameMongo> gamesHistory = new ArrayList<>();
 
-    public PlayerMongo(String name) {
+    @Email
+    @NotBlank
+    @Field(name = "email")
+    @Schema(description = "Email of the player", example = "montse@gmail.com")
+    private String email;
+
+    @NotBlank
+    @Field(name = "password")
+    @Schema(description = "Password of the player", example = "password123")
+    private String password;
+
+    @Field(name = "role")
+    @Schema(description = "Role of the player", example = "USER")
+    private RoleMongo role;
+
+    public PlayerMongo(String name, String email, String password) {
         this.name = name;
+        this.email = email;
+        this.password = password;
         this.registration = LocalDateTime.now();
     }
 

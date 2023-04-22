@@ -77,5 +77,5 @@ Afegeix Mocks al testing del projecte (Mockito) i Contract Tests (https://docs.p
 
 Dissenya i modifica el projecte diversificant la persistència perquè faci servir dos esquemes de base de dades alhora, MySQL i Mongo.
 
-
+**Persistència doble sense seguretat en el repositori: https://github.com/montseliz/Tasca_s5_02**
 

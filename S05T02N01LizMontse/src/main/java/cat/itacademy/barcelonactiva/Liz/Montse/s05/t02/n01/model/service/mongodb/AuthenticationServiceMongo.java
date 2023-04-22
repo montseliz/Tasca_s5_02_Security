@@ -1,17 +1,16 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mongodb;
 
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Player;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Role;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.AuthenticationResponseDTO;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.LoginDTO;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.RegisterDTO;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.RegisterPlayerDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mongodb.PlayerMongo;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mongodb.RoleMongo;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.AuthenticationResponseMongoDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.LoginMongoDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.RegisterMongoDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.RegisterPlayerMongoDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.EmailDuplicatedException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PasswordIncorrectException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerDuplicatedException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerNotFoundException;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.repository.mysql.IPlayerRepository;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.repository.mysql.IRoleRepository;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.repository.mongodb.IPlayerMongoRepository;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.security.JwtGenerator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,22 +25,20 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class AuthenticationService {
+public class AuthenticationServiceMongo {
 
     @Autowired
     private ModelMapper modelMapper;
 
     private final AuthenticationManager authenticationManager;
-    private final IPlayerRepository playerRepository;
-    private final IRoleRepository roleRepository;
+    private final IPlayerMongoRepository playerMongoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtGenerator jwtGenerator;
 
     @Autowired
-    public AuthenticationService(AuthenticationManager authenticationManager, IPlayerRepository playerRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
+    public AuthenticationServiceMongo(AuthenticationManager authenticationManager, IPlayerMongoRepository playerMongoRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
         this.authenticationManager = authenticationManager;
-        this.playerRepository = playerRepository;
-        this.roleRepository = roleRepository;
+        this.playerMongoRepository = playerMongoRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
     }
@@ -49,25 +46,25 @@ public class AuthenticationService {
     /**
      * Mètode per crear un registre a la base de dades. S'utilitza en el mètode register() de l'AuthenticationController.
      */
-    public RegisterPlayerDTO createRegister(RegisterDTO registerDTO) {
+    public RegisterPlayerMongoDTO createRegister(RegisterMongoDTO registerDTO) {
 
-        RegisterDTO registerEmailValidated = validateRegisterEmail(registerDTO);
-        RegisterDTO registerEmailAndNameValidated = validateRegisterName(registerEmailValidated);
+        RegisterMongoDTO registerEmailValidated = validateRegisterEmail(registerDTO);
+        RegisterMongoDTO registerEmailAndNameValidated = validateRegisterName(registerEmailValidated);
 
-        Player player = new Player (registerEmailAndNameValidated.getName(), registerEmailAndNameValidated.getEmail(), passwordEncoder.encode(registerEmailAndNameValidated.getPassword()));
+        PlayerMongo player = new PlayerMongo(registerEmailAndNameValidated.getName(), registerEmailAndNameValidated.getEmail(), passwordEncoder.encode(registerEmailAndNameValidated.getPassword()));
 
-        player.setRole(assignRoleToPlayer());
-        playerRepository.save(player);
+        assignRoleToPlayer(player);
+        playerMongoRepository.save(player);
 
-        return modelMapper.map(player, RegisterPlayerDTO.class);
+        return modelMapper.map(player, RegisterPlayerMongoDTO.class);
     }
 
     /**
      * Mètode per comprovar si l'email del Player a registrar és únic perquè no es repeteixi a la base de dades.
      * S'utilitza en el mètode createRegister().
      */
-    public RegisterDTO validateRegisterEmail (RegisterDTO registerDTO) {
-        if (playerRepository.existsByEmail(registerDTO.getEmail())) {
+    public RegisterMongoDTO validateRegisterEmail (RegisterMongoDTO registerDTO) {
+        if (playerMongoRepository.existsByEmail(registerDTO.getEmail())) {
             throw new EmailDuplicatedException("Email introduced already exists");
         } else {
             return registerDTO;
@@ -78,9 +75,9 @@ public class AuthenticationService {
      * Mètode per comprovar si el nom del Player a registrar és únic perquè no es repeteixi a la base de dades i mentre no sigui "unknown".
      * S'utilitza en el mètode createRegister().
      */
-    public RegisterDTO validateRegisterName (RegisterDTO registerDTO) {
-        RegisterDTO playerUnknown =createUnknownName(registerDTO);
-        if ((playerRepository.existsByName(playerUnknown.getName())) && (!registerDTO.getName().equalsIgnoreCase("unknown"))) {
+    public RegisterMongoDTO validateRegisterName (RegisterMongoDTO registerDTO) {
+        RegisterMongoDTO playerUnknown = createUnknownName(registerDTO);
+        if ((playerMongoRepository.existsByName(playerUnknown.getName())) && (!registerDTO.getName().equalsIgnoreCase("unknown"))) {
             throw new PlayerDuplicatedException("Player's name must be unique");
         } else {
             return registerDTO;
@@ -91,7 +88,7 @@ public class AuthenticationService {
      * Mètode per generar el nom del Player a registrar a "unknown" en cas que sigui null, buit o en blanc.
      * S'utilitza en el mètode validateRegisterName().
      */
-    public RegisterDTO createUnknownName (RegisterDTO registerDTO) {
+    public RegisterMongoDTO createUnknownName (RegisterMongoDTO registerDTO) {
         if ((registerDTO.getName() == null) || (registerDTO.getName().isEmpty()) || (registerDTO.getName().isBlank())) {
             registerDTO.setName("unknown");
         }
@@ -101,23 +98,24 @@ public class AuthenticationService {
     /**
      * Mètode per assignar el role "USER" al player. S'utilitza en el mètode createRegister().
      */
-    public Role assignRoleToPlayer() {
-        Role role;
-        Optional<Role> playerRole = roleRepository.findByName("USER");
+    public void assignRoleToPlayer(PlayerMongo player) {
+        RoleMongo role;
+        Optional<PlayerMongo> playerRole = playerMongoRepository.findByRole("USER");
+
         if (playerRole.isPresent()) {
-            role = playerRole.get();
+            role = playerRole.get().getRole();
         } else {
-            role = new Role("USER");
-            roleRepository.save(role);
+            role = new RoleMongo("USER");
         }
-        return role;
+
+        player.setRole(role);
     }
 
     /**
      * Mètode per autenticar el player. S'utilitza en el mètode login() de l'AuthenticationController.
      */
-    public AuthenticationResponseDTO authenticateRegister(LoginDTO loginDTO) {
-        LoginDTO loginDTOValidated = validateLoginEmailAndPassword(loginDTO);
+    public AuthenticationResponseMongoDTO authenticateRegister(LoginMongoDTO loginDTO) {
+        LoginMongoDTO loginDTOValidated = validateLoginEmailAndPassword(loginDTO);
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTOValidated.getEmail(), loginDTOValidated.getPassword()));
 
@@ -129,14 +127,14 @@ public class AuthenticationService {
             throw new AuthenticationCredentialsNotFoundException("Token generated is not valid");
         }
 
-        return new AuthenticationResponseDTO(loginDTOValidated.getEmail(), passwordEncoder.encode(loginDTOValidated.getPassword()), token);
+        return new AuthenticationResponseMongoDTO(loginDTOValidated.getEmail(), passwordEncoder.encode(loginDTOValidated.getPassword()), token);
     }
 
     /**
      * Mètode per validar l'email i el password a la base de dades. S`utilitza en el mètode authenticateRegister().
      */
-    public LoginDTO validateLoginEmailAndPassword (LoginDTO loginDTO) {
-        RegisterPlayerDTO registerPlayerDTO = findEmailInDB(loginDTO);
+    public LoginMongoDTO validateLoginEmailAndPassword (LoginMongoDTO loginDTO) {
+        RegisterPlayerMongoDTO registerPlayerDTO = findEmailInDB(loginDTO);
         String encodedPassword = registerPlayerDTO.getPassword();
         String password = loginDTO.getPassword();
 
@@ -150,10 +148,10 @@ public class AuthenticationService {
     /**
      * Mètode per trobar el player a través de l'email, a la base de dades. S'utilitza en el mètode validateLoginEmailAndPassword().
      */
-    public RegisterPlayerDTO findEmailInDB(LoginDTO loginDTO) {
+    public RegisterPlayerMongoDTO findEmailInDB(LoginMongoDTO loginDTO) {
 
-        Player player;
-        Optional<Player> emailFromDB = playerRepository.findByEmail(loginDTO.getEmail());
+        PlayerMongo player;
+        Optional<PlayerMongo> emailFromDB = playerMongoRepository.findByEmail(loginDTO.getEmail());
 
         if (emailFromDB.isPresent()) {
             player = emailFromDB.get();
@@ -161,7 +159,7 @@ public class AuthenticationService {
             throw new PlayerNotFoundException("Player's email not found or incorrect");
         }
 
-        return modelMapper.map(player, RegisterPlayerDTO.class);
+        return modelMapper.map(player, RegisterPlayerMongoDTO.class);
     }
 
 }
