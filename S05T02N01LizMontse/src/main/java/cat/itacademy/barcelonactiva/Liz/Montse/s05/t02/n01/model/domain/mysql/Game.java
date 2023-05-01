@@ -3,12 +3,14 @@ package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.tools.Helpers.obtainResult;
 import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.tools.Helpers.rollDice;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

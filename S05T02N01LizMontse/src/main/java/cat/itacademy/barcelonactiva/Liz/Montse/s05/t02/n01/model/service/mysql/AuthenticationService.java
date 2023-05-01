@@ -28,9 +28,7 @@ import java.util.Optional;
 @Service
 public class AuthenticationService {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
+    private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     private final IPlayerRepository playerRepository;
     private final IRoleRepository roleRepository;
@@ -38,7 +36,9 @@ public class AuthenticationService {
     private final JwtGenerator jwtGenerator;
 
     @Autowired
-    public AuthenticationService(AuthenticationManager authenticationManager, IPlayerRepository playerRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
+    public AuthenticationService(ModelMapper modelMapper, AuthenticationManager authenticationManager, IPlayerRepository playerRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
+        super();
+        this.modelMapper = modelMapper;
         this.authenticationManager = authenticationManager;
         this.playerRepository = playerRepository;
         this.roleRepository = roleRepository;

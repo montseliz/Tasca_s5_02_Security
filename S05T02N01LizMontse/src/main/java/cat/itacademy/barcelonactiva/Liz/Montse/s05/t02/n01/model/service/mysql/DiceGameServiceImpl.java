@@ -25,31 +25,30 @@ import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.m
 @Service
 public class DiceGameServiceImpl implements IPlayerService, IGameService {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
+    private final ModelMapper modelMapper;
     private final IPlayerRepository playerRepository;
     private final IGameRepository gameRepository;
     private final AuthenticationService authenticationService;
 
     @Autowired
-    public DiceGameServiceImpl(IPlayerRepository playerRepository, IGameRepository gameRepository, AuthenticationService authenticationService) {
+    public DiceGameServiceImpl(ModelMapper modelMapper, IPlayerRepository playerRepository, IGameRepository gameRepository, AuthenticationService authenticationService) {
         super();
+        this.modelMapper = modelMapper;
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
         this.authenticationService = authenticationService;
     }
 
     //region CONVERTERS
-    private PlayerDTO convertPlayerToDTO (Player player) {
+    public PlayerDTO convertPlayerToDTO (Player player) {
         return modelMapper.map(player, PlayerDTO.class);
     }
 
-    private GameDTO convertGameToDTO (Game game) {
+    public GameDTO convertGameToDTO (Game game) {
         return modelMapper.map(game, GameDTO.class);
     }
 
-    private List<GameDTO> convertGameListToDTO(List<Game> gamesHistory) {
+    public List<GameDTO> convertGameListToDTO(List<Game> gamesHistory) {
         return gamesHistory.stream().map(this::convertGameToDTO).collect(Collectors.toList());
     }
     //endregion CONVERTERS

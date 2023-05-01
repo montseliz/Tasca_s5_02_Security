@@ -23,15 +23,14 @@ import java.util.stream.Collectors;
 @Service
 public class DiceGameMongoServiceImpl implements IPlayerMongoService, IGameMongoService {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
+    private final ModelMapper modelMapper;
     private final IPlayerMongoRepository playerRepository;
     private final AuthenticationServiceMongo authenticationServiceMongo;
 
     @Autowired
-    public DiceGameMongoServiceImpl(IPlayerMongoRepository playerRepository, AuthenticationServiceMongo authenticationServiceMongo) {
+    public DiceGameMongoServiceImpl(ModelMapper modelMapper, IPlayerMongoRepository playerRepository, AuthenticationServiceMongo authenticationServiceMongo) {
         super();
+        this.modelMapper = modelMapper;
         this.playerRepository = playerRepository;
         this.authenticationServiceMongo = authenticationServiceMongo;
     }

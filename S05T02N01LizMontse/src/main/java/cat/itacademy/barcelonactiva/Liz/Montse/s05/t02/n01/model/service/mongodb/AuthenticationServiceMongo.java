@@ -27,16 +27,15 @@ import java.util.Optional;
 @Service
 public class AuthenticationServiceMongo {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
+    private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     private final IPlayerMongoRepository playerMongoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtGenerator jwtGenerator;
 
     @Autowired
-    public AuthenticationServiceMongo(AuthenticationManager authenticationManager, IPlayerMongoRepository playerMongoRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
+    public AuthenticationServiceMongo(ModelMapper modelMapper, AuthenticationManager authenticationManager, IPlayerMongoRepository playerMongoRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
+        this.modelMapper = modelMapper;
         this.authenticationManager = authenticationManager;
         this.playerMongoRepository = playerMongoRepository;
         this.passwordEncoder = passwordEncoder;
